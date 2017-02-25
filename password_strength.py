@@ -29,10 +29,10 @@ def dates_match(password, strength):
 
 def get_password_strength(password):
 
-    blacklist = load_bad_passwords('500-worst-passwords.txt')
+    blacklist = load_bad_passwords('10k_most_common.txt')
     strength = 1
 
-    if password in blacklist or len(password) == 1:
+    if str.lower(password) in blacklist or len(password) == 1:
         pass
     else:
         if len(re.findall('\d', password)) >= 1:
