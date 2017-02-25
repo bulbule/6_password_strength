@@ -74,4 +74,4 @@ if __name__ == '__main__':
     if not password:
         raise ValueError('You did not enter anything.')
     else:
-        print(get_password_strength(password))
+        print('''Password's strength is''', get_password_strength(password))
