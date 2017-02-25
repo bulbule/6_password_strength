@@ -11,6 +11,7 @@ the file: 500-worst-passwords.txt. Then it proceeds with checking if the passwor
 # Usage
 
 ```#!bash
+
 $ python password_strength.py
 Enter a password:Kn0pk@
 Password's strength is 6
