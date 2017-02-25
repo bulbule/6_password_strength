@@ -53,11 +53,11 @@ def get_password_strength(password):
             strength += 1
         if len(re.findall('[^a-zA-Z0-9]', password)) >= 2:
             strength += 1
-        if len(password) > 5:
+        if len(password) >= 5:
             strength += 1
-        if len(password) > 8:
+        if len(password) >= 8:
             strength += 1
-        if len(password) > 11:
+        if len(password) >= 11:
             strength += 1
 
         strength = dates_match(password, strength)
