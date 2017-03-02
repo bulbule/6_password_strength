@@ -2,7 +2,7 @@
 
 A program asks the user for a password and assesses its strength from 1 (very weak) to 10 (very strong).
 It is done by first checking if the password belongs to a certain blacklist, which is contained in
-the file blacklist.txt. Then it proceeds with checking if the password:
+the file **blacklist.txt**. Then it proceeds with checking if the password:
 * contains digits
 * contains letters
 * is case-sensitive
@@ -15,7 +15,7 @@ the file blacklist.txt. Then it proceeds with checking if the password:
 
 $ python password_strength.py
 Enter a password:Kn0pk@
-Password's strength is 6
+Password's strength is 6/10
 
 ```
 
