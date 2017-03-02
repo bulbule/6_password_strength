@@ -10,8 +10,9 @@ def load_bad_passwords(filepath):
         return data_file.read()
 
 
-def dates_match(password, strength):  # matches years 1900-2099
+def check_dates(password):  # matches years 1900-2099
 
+    indicator = 0
     yymmdd = re.compile(
         '(19|20)\d\d(-| |/|.|_)?(0[1-9]|1[012])(-| |/|.|_)?(0[1-9]|[12][0-9]|3[01])')
     mmddyy = re.compile(
@@ -21,9 +22,74 @@ def dates_match(password, strength):  # matches years 1900-2099
 
     if (len(re.findall(yymmdd, password)) >= 1) or (len(re.findall(
             mmddyy, password)) >= 1) or (len(re.findall(ddmmyy, password)) >= 1):
-        strength -= 2
+        indicator -= 2
 
-    return strength
+    return indicator
+
+
+def check_length(password):
+
+    optimal_length = 12
+    indicator = 0
+
+    if 0.5 * optimal_length <= len(password) < 0.7 * optimal_length:
+        indicator += 1
+    elif 0.7 * optimal_length < len(password) < optimal_length:
+        indicator += 2
+    elif len(password) >= optimal_length:
+        indicator += 3
+
+    return indicator
+
+
+def check_digits(password):
+
+    indicator = 0
+
+    if len(re.findall('\d', password)) == 1:
+        indicator += 1
+    elif len(re.findall('\d', password)) > 1:
+        indicator += 2
+
+    return indicator
+
+
+def check_special_characters(password):
+
+    indicator = 0
+
+    if len(re.findall('[^a-zA-Z0-9]', password)) == 1:
+        indicator += 1
+    elif len(re.findall('[^a-zA-Z0-9]', password)) > 1:
+        indicator += 2
+
+    return indicator
+
+
+def check_letters(password):
+
+    indicator = 0
+
+    if len(re.findall('[a-zA-Z]', password)) > 0:
+        indicator += 1
+
+    return indicator
+
+
+def check_case_sensitivity(password):
+
+    indicator = 0
+
+    if len(
+        re.findall(
+            '[a-z]',
+            password)) > 0 and len(
+            re.findall(
+                '[A-Z]',
+                password)) > 0:
+        indicator += 1
+
+    return indicator
 
 
 def get_password_strength(password, blacklist):
@@ -33,26 +99,12 @@ def get_password_strength(password, blacklist):
     if str.lower(password) in blacklist or len(password) == 1:
         pass
     else:
-        if len(re.findall('[a-z]', password)) > 0:
-            strength += 1
-        if len(re.findall('[A-Z]', password)) > 0:
-            strength += 1
-        if len(re.findall('\d', password)) == 1:
-            strength += 1
-        elif len(re.findall('\d', password)) > 1:
-            strength += 2
-        if len(re.findall('[^a-zA-Z0-9]', password)) == 1:
-            strength += 1
-        elif len(re.findall('[^a-zA-Z0-9]', password)) > 1:
-            strength += 2
-        if 4 < len(password) < 8:
-            strength += 1
-        elif 7 < len(password) < 11:
-            strength += 2
-        elif len(password) > 10:
-            strength += 3
-
-        strength = dates_match(password, strength)
+        strength += (check_letters(password)
+                    + check_digits(password)
+                    + check_length(password)
+                    + check_special_characters(password)
+                    + check_case_sensitivity(password)
+                    + check_dates(password))
 
     return strength
 
