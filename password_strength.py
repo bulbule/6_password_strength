@@ -54,7 +54,6 @@ def get_password_strength(password, blacklist):
 
         strength = dates_match(password, strength)
 
-
     return strength
 
 
