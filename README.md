@@ -14,7 +14,7 @@ You can download various lists of most common passwords, for instance, from this
 
 ```#!bash
 
-$ python password_strength.py
+$ python password_strength.py blacklist.txt
 Enter a password:
 Password's strength is 6/10
 
