@@ -2,8 +2,9 @@ import os
 import re
 import argparse
 from getpass import getpass
+from datetime import datetime
 
-strength_points = {'length': 3,
+STRENGTH_POINTS = {'length': 3,
                    'date': -2,
                    'digits': 2,
                    'sp_chars': 2,
@@ -23,16 +24,19 @@ def load_blacklist(filepath):
 def check_dates(password):
 
     indicator = 0
-    yymmdd = re.compile(
-        '(1[0-9]|20)\d\d(-| |/|.|_)?(0[1-9]|1[012])(-| |/|.|_)?(0[1-9]|[12][0-9]|3[01])')
-    mmddyy = re.compile(
-        '(0[1-9]|[1-9]|1[012])(-| |/|.|_)?(0[1-9]|[12][0-9]|3[01])(-| |/|.|_)?(1[0-9]|20)\d\d')
-    ddmmyy = re.compile(
-        '(0[1-9]|[1-9]|[12][0-9]|3[01])(-| |/|.|_)?(0[1-9]|1[012])(-| |/|.|_)?(1[0-9]|20)\d\d')
+    dates_formats = ['%Y%m%d', '%Y-%m-%d', '%Y.%m.%d', '%Y_%m_%d', '%Y/%m/%d',
+                     '%d%m%Y', '%d-%m-%Y', '%d.%m.%Y', '%d_%m_%Y', '%d/%m/%Y',
+                     '%m%d%Y', '%m-%d-%Y', '%m.%d.%Y', '%m_%d_%Y', '%m/%d/%Y',
+                     '%e%m%Y', '%e-%m-%Y', '%e.%m.%Y', '%e_%m_%Y', '%e/%m/%Y'
+                     ]
 
-    if re.search(yymmdd, password) or re.search(
-            mmddyy, password) or re.search(ddmmyy, password):
-        indicator += strength_points['date']
+    for date_format in dates_formats:
+        try:
+            if datetime.strptime(password, date_format):
+                indicator += STRENGTH_POINTS['date']
+                break
+        except ValueError:
+            pass
 
     return indicator
 
@@ -43,11 +47,11 @@ def check_length(password):
     indicator = 0
 
     if 0.5 * optimal_length <= len(password) < 0.7 * optimal_length:
-        indicator += strength_points['length'] // 3
+        indicator += STRENGTH_POINTS['length'] // 3
     elif 0.7 * optimal_length < len(password) < optimal_length:
-        indicator += 2 * strength_points['length'] // 3
+        indicator += 2 * STRENGTH_POINTS['length'] // 3
     elif len(password) >= optimal_length:
-        indicator += strength_points['length']
+        indicator += STRENGTH_POINTS['length']
 
     return indicator
 
@@ -57,9 +61,9 @@ def check_digits(password):
     indicator = 0
 
     if re.search('\d', password):
-        indicator += strength_points['digits'] // 2
+        indicator += STRENGTH_POINTS['digits'] // 2
         if len(re.findall('\d', password)) > 1:
-            indicator += strength_points['digits'] // 2
+            indicator += STRENGTH_POINTS['digits'] // 2
 
     return indicator
 
@@ -69,9 +73,9 @@ def check_special_characters(password):
     indicator = 0
 
     if re.search('[^a-zA-Z0-9]', password):
-        indicator += strength_points['sp_chars'] // 2
+        indicator += STRENGTH_POINTS['sp_chars'] // 2
         if len(re.findall('[^a-zA-Z0-9]', password)) > 1:
-            indicator += strength_points['sp_chars'] // 2
+            indicator += STRENGTH_POINTS['sp_chars'] // 2
 
     return indicator
 
@@ -81,7 +85,7 @@ def check_letters(password):
     indicator = 0
 
     if re.search('[a-zA-Z]', password):
-        indicator += strength_points['letters']
+        indicator += STRENGTH_POINTS['letters']
 
     return indicator
 
@@ -91,7 +95,7 @@ def check_case_sensitivity(password):
     indicator = 0
 
     if re.search('[a-z]', password) and re.search('[A-Z]', password):
-        indicator += strength_points['case_sense']
+        indicator += STRENGTH_POINTS['case_sense']
 
     return indicator
 
@@ -118,7 +122,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('path_to_blacklist')
     args = parser.parse_args()
-    blacklist = load_blacklist(args.path_to_blacklist)
 
     password = getpass("Enter a password:")
     if not password:
